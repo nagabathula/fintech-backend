@@ -33,3 +33,11 @@ class UserTrade(db.Model):
     quantity = db.Column(db.Integer, nullable=False)
     total_value = db.Column(db.Numeric(15, 2))
     trade_date = db.Column(db.DateTime, nullable=False)
+
+class Stocks(db.Model):
+    __tablename__ = 'Stocks'
+
+    stock = db.Column('Stock', db.String(10), primary_key=True)
+    company_name = db.Column('CompanyName', db.String(100), nullable=False)
+    index_name = db.Column('IndexName', db.String(20), nullable=False)
+    risk = db.Column('Risk', db.String(10), nullable=False)

@@ -5,6 +5,7 @@ from run import app,db
 from models import UserCredentials
 from models import UserProfile
 from models import UserTrade
+from models import Stocks
 import datetime
 from dateutil import parser
 
@@ -210,3 +211,21 @@ def delete_user_profile(user_id):
     db.session.delete(profile)
     db.session.commit()
     return jsonify({'message': 'User profile deleted successfully'})
+
+@app.route('/fetch_stocks', methods=['GET'])
+def fetch_stocks():
+    # Retrieve the 'index' and 'risk' from the query parameters
+    index_name = request.args.get('index')
+    risk_level = request.args.get('risk')
+    
+    # Filter the Stocks based on provided index and risk
+    if index_name and risk_level:
+        stocks = Stocks.query.filter_by(index_name=index_name, risk=risk_level).all()
+        results = [
+            {"StockTicker": stock.stock, "CompanyName": stock.company_name}
+            for stock in stocks
+        ]
+        return jsonify(results)
+    else:
+        return jsonify({"error": "Missing index or risk parameters"}), 400
+
