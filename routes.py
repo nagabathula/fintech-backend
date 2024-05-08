@@ -229,3 +229,25 @@ def fetch_stocks():
     else:
         return jsonify({"error": "Missing index or risk parameters"}), 400
 
+@app.route('/api/all_user_trades', methods=['GET'])
+def get_all_user_trades():
+    try:
+        # Query all trades in the UserTrade table
+        trades = UserTrade.query.all()
+        # Serialize the data to JSON format
+        trades_list = [{
+            'trade_id': trade.trade_id,
+            'user_id': trade.user_id,
+            'platform_id': trade.platform_id,
+            'symbol': trade.symbol,
+            'trade_type': trade.trade_type,
+            'price': float(trade.price),
+            'quantity': trade.quantity,
+            'total_value': float(trade.total_value) if trade.total_value else None,
+            'trade_date': trade.trade_date.isoformat() if trade.trade_date else None
+        } for trade in trades]
+        
+        return jsonify(trades_list), 200
+    except Exception as e:
+        # Handle errors in case the database query fails
+        return jsonify({'error': 'Unable to fetch user trades', 'details': str(e)}), 500
