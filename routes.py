@@ -6,6 +6,7 @@ from models import UserCredentials
 from models import UserProfile
 from models import UserTrade
 from models import Stocks
+from models import StockPrediction
 import datetime
 from dateutil import parser
 
@@ -251,3 +252,36 @@ def get_all_user_trades():
     except Exception as e:
         # Handle errors in case the database query fails
         return jsonify({'error': 'Unable to fetch user trades', 'details': str(e)}), 500
+    
+
+@app.route('/api/stock_predictions', methods=['GET'])
+def get_stock_predictions():
+    ticker = request.args.get('ticker')
+    risk_category = request.args.get('risk_category')
+    sector = request.args.get('sector')
+
+    query = StockPrediction.query
+
+    if ticker:
+        query = query.filter(StockPrediction.ticker == ticker)
+    if risk_category:
+        query = query.filter(StockPrediction.risk_category == float(risk_category))
+    if sector:
+        query = query.filter(StockPrediction.sector == sector)
+
+    # Order the results by predicted returns in descending order
+    results = query.order_by(StockPrediction.predicted_returns.desc()).all()
+
+    # Serialize the data for JSON output
+    data = [{
+        'ticker': stock.ticker,
+        'company_name': stock.company_name,
+        'sector': stock.sector,
+        'market_cap': stock.market_cap,
+        'beta': stock.beta,
+        'volatility': stock.volatility,
+        'risk_category': stock.risk_category,
+        'predicted_returns': stock.predicted_returns
+    } for stock in results]
+
+    return jsonify(data)

@@ -41,3 +41,16 @@ class Stocks(db.Model):
     company_name = db.Column('CompanyName', db.String(100), nullable=False)
     index_name = db.Column('IndexName', db.String(20), nullable=False)
     risk = db.Column('Risk', db.String(10), nullable=False)
+
+
+class StockPrediction(db.Model):
+    __tablename__ = 'stock_prediction'
+
+    ticker = db.Column(db.String(16383), primary_key=True)
+    company_name = db.Column(db.String(16383))
+    sector = db.Column(db.String(16383))
+    market_cap = db.Column(db.BigInteger)
+    beta = db.Column(db.Float)
+    volatility = db.Column(db.Float)
+    risk_category = db.Column(db.Float)
+    predicted_returns = db.Column(db.Float)
