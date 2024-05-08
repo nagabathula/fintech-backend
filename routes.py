@@ -86,6 +86,29 @@ def place_trade():
     )
     return jsonify(response)
 
+
+@app.route('/api/v1/trade', methods=['POST'])
+def place_trades():
+    orders = request.get_json()
+    if not orders or not isinstance(orders, list):
+        return jsonify({'error': 'Invalid input, expected a list of orders'}), 400
+    
+    results = []
+    for order in orders:
+        if {'symbol', 'qty', 'side', 'type', 'time_in_force'} <= set(order.keys()):
+            result = submit_order(
+                symbol=order['symbol'],
+                qty=order['qty'],
+                side=order['side'],
+                type=order['type'],
+                time_in_force=order['time_in_force']
+            )
+            results.append(result)
+        else:
+            results.append({'error': f"Missing required keys in order for {order.get('symbol', 'unknown')}"})
+
+    return jsonify(results)
+
 @app.route('/api/alpaca_positions', methods=['GET'])
 def get_positions():
     url = f"{BASE_URL}/v2/positions"
