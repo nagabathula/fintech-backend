@@ -58,6 +58,36 @@ ALPACA_API_KEY = 'PK4ZWZ0OK1URS2BSC6AW'
 ALPACA_SECRET_KEY = 'N15y9j4ZyUcN3KtMfrz008p0Kvc8I1hwXLpisRoV'
 BASE_URL = 'https://paper-api.alpaca.markets'
 
+
+@app.route('/api/account_info')
+def account_info():
+    # Endpoint to get account configuration and status
+    account_url = f"{BASE_URL}/v2/account"
+    headers = {
+        'APCA-API-KEY-ID': ALPACA_API_KEY,
+        'APCA-API-SECRET-KEY': ALPACA_SECRET_KEY
+    }
+    
+    try:
+        # Get account data
+        account_response = requests.get(account_url, headers=headers)
+        account_data = account_response.json()
+
+        # Extract necessary data from account details
+        total_cash = account_data.get('cash', '0')
+        portfolio_value = account_data.get('portfolio_value', '0')
+        position_market_value = account_data.get('position_market_value', '0')
+
+        data = {
+            'total_cash': total_cash,
+            'position_market_values': position_market_value,
+            'portfolio_value': portfolio_value
+        }
+        return jsonify(data)
+    except Exception as e:
+        return jsonify({'error': str(e)})
+    
+
 def submit_order(symbol, qty, side, type, time_in_force):
     url = f"{BASE_URL}/v2/orders"
     headers = {
