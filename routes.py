@@ -325,16 +325,23 @@ def get_stock_predictions():
     # Order the results by predicted returns in descending order
     results = query.order_by(StockPrediction.predicted_returns.desc()).all()
 
-    # Serialize the data for JSON output
     data = [{
         'ticker': stock.ticker,
         'company_name': stock.company_name,
         'sector': stock.sector,
-        'market_cap': stock.market_cap,
+        'market_cap': f"${format_market_cap(stock.market_cap)}",
         'beta': stock.beta,
         'volatility': stock.volatility,
         'risk_category': stock.risk_category,
-        'predicted_returns': stock.predicted_returns
+        'predicted_returns': f"{stock.predicted_returns:.2f}%"
     } for stock in results]
 
     return jsonify(data)
+
+def format_market_cap(value):
+    if value >= 1e9:
+        return f"{value / 1e9:.2f}B"
+    elif value >= 1e6:
+        return f"{value / 1e6:.2f}M"
+    else:
+        return f"{value:.2f}"
